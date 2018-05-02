@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>旋转动画</title>
+	<link rel="stylesheet" href="../css/heater.css">
+	<style>
+		html,body{
+			display: flex;
+			width: 100%;
+			height: 100%;
+			background-color: #000;
+			perspective: 800px;
+		}
+		#box{
+			position: relative;
+			width: 133px;
+			height: 200px;
+			margin: auto;
+			transform-style: preserve-3d; 
+			transform: rotateX(-20deg);
+			
+		}
+		#box img{
+			position: absolute;
+			top: 0;
+			left: 0;
+			-webkit-box-reflect: below 15px -webkit-linear-gradient(
+                    top,
+                    rgba(0,0,0,0.8) 30%,
+                    rgba(0,0,0,0.02) 100%
+            )
+		}
+		#box p{
+			position: absolute;
+			width: 800px;
+			height: 800px;
+			left: calc(133px/2 - 800px/2);
+			top: calc(200px/2 - 800px/2);
+			background-color: rgba(225,225,225,0.1);
+			border-radius: 50%;
+			transform: translateY(100px) rotateX(90deg);
+		}
+	</style>
+</head>
+<body>
+	<div id="heater">
+		<ul class="nav">
+			<li>小案例
+				<ul class="second-nav">
+					<li><a href="../3d旋转/旋转动画.html">3d旋转</a></li>
+					<li><a href="../canvas-粒子/粒子.html">canvas-粒子</a></li>
+					<li><a href="../tranform/轮播.html">tranform</a></li>
+					<li><a href="../upload/upload.html">upload</a></li>
+					<li><a href="../本地存储-便签/本地存储-便签.html">本地存储-便签</a></li>
+					<li><a href="../三维数组时钟/clock.html">三维数组时钟</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div id="box">
+		<img src="img/1.jpg" alt="">
+		<img src="img/2.jpg" alt="">
+		<img src="img/3.jpg" alt="">
+		<img src="img/4.jpg" alt="">
+		<img src="img/5.jpg" alt="">
+		<img src="img/6.jpg" alt="">
+		<img src="img/7.jpg" alt="">
+		<img src="img/8.jpg" alt="">
+		<img src="img/9.jpg" alt="">
+		<img src="img/10.jpg" alt="">
+		<img src="img/11.jpg" alt="">
+		<p></p>
+	</div>
+	<script>
+		window.onload = function(){
+			var aImg = document.getElementsByTagName('img');
+			var aBox = document.getElementById("box");
+			for(var i=0; i<aImg.length; i++){
+				aImg[i].style.transform = "rotateY("+(i*360/+aImg.length)+"deg) translateZ(350px)";
+				aImg[i].style.transition = '1s '+(aImg.length-i)*0.1+'s'
+			}
+			var startX = 0,
+				startY = 0,
+				nowX = 0,
+				nowY = 0,
+				diffX = 0,
+				diffY = 0,
+				rotY = -20,
+				rotX = 0,
+				timer = null;
+			document.onmousedown = function(e){
+				var e = e || window.event;
+				startX = e.clientX;
+				startY = e.clientY;
+				clearInterval(timer);
+				this.onmousemove = function(e){
+					var e = e || window.event;
+					nowX = e.clientX;
+					nowY = e.clientY;
+					diffX = nowX - startX;
+					diffY = nowY - startY;
+					rotX += diffX*0.1;
+					rotY -= diffY*0.2;
+					aBox.style.transform = "rotateX("+rotY+"deg) rotateY("+rotX+"deg)";
+					startX = nowX;
+                    startY = nowY;
+					this.onmouseup = function(e){
+						this.onmousemove = this.onmouseup = null;
+						timer = setInterval(function(){
+							diffX *= 0.95;
+							diffY *= 0.95;
+							rotX += diffX*0.1;
+							rotY -= diffY*0.2;
+							aBox.style.transform = "rotateX("+rotY+"deg) rotateY("+rotX+"deg)";
+							if(Math.abs(diffX) < 0.5 && Math.abs(diffY) < 0.5){
+								clearInterval(timer);
+							}
+						}, 13)
+					}
+				}
+				return false;
+			}
+		}
+	</script>
+	
+</body>
+</html>

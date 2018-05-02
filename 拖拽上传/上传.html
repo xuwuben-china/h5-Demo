@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>上传文件</title>
+	<style>
+		body{
+			background-color: #ccc;
+		}
+		*{margin: 0;padding: 0;}
+		li{
+			list-style: none;
+		}
+		.clearfix:after{
+			display: block;
+			content:"";
+			clear:both;
+		}
+		#warp{
+			width: 1000px;
+			background-color: #fff;
+			margin: 80px auto 0;
+			padding-bottom: 20px;
+			border-radius: 5px;
+		}
+		#warp .title{
+			height:40px;
+			text-align: center;
+			line-height: 40px;
+			color: #aaa;
+			font-size: 20px;
+			border-bottom: 1px solid #ccc;
+		}
+		#warp .operation{
+			margin: 20px;
+		}
+		.operation .top .select{
+			position: relative;
+			float: left;
+			width: 250px;
+			height: 180px;
+			background: #DEDDDD url("img/1.png") left top/100%;
+		}
+		.operation .top .select p{
+			position: absolute;
+			bottom:0;
+			left:0;
+			height: 40px;
+			width: 100%;
+			text-align: center;
+			line-height: 40px;
+			color: #fff;
+			background-color: rgb(107, 195, 13);
+			cursor:pointer;
+			
+		}
+		.operation .top .release{
+			box-sizing: border-box;
+			float: right;
+			width: 680px;
+			height: 180px;
+			text-align: center;
+			line-height: 180px;
+			color:#999;
+			background-color: #DEDDDD;
+		}
+		.operation .bottom{
+			margin-top:20px;
+			height: 50px;
+		}
+		.operation .bottom .text{
+			float: left;
+			margin-top: 15px;
+		}
+		.operation .bottom .btn{
+			float: right;
+			margin-top: 5px;
+		}
+		.operation .bottom .btn li{
+			float: left;
+			margin-left: 10px;
+			padding: 8px 12px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		.operation .bottom .btn li.continue{
+			background-color: #ccc;
+		}
+		.operation .bottom .btn li.uploading{
+			background-color: rgb(107, 195, 13);
+		}
+		#warp .show{
+			min-height: 80px;
+			border: 1px solid #ccc;
+			margin: 20px;
+		}
+		#warp .show .show-img{
+			padding: 20px;
+		}
+		.show .show-img li{
+			position: relative;
+			float: left;
+			height: 250px;
+			margin:20px;
+		}
+		.show-img li p{
+			position: absolute;
+			width: 100%;
+			height: 0;
+			overflow: hidden;
+			transition: .5s;
+			text-indent: 10px;
+			line-height: 40px;
+			color:#333;
+			background-color: rgb(191, 191, 191);
+
+		}
+		.show-img li:hover p{
+			height: 40px;
+		}
+		.show-img li p i{
+			float: right;
+			width: 40px;
+			height: 40px;
+			background: url("img/rubbish.png") center/40px 40px;
+			cursor:pointer;
+		}
+		.show-img li img{
+			height: 100%;
+			max-width: 800px;
+		}
+	</style>
+</head>
+<body>
+	<div id="warp">
+		<div class="title">图片拖拽上传</div>
+		<div class="operation">
+			<div class="top clearfix">
+				<div class="select">
+					<p>选择图片</p>
+				</div>
+				<div class="release">请将图片拖拽到此处</div>
+			</div>
+			<div class="bottom">
+				<p class="text">已选
+					<span class="num"></span>中张图片，共
+					<span class="size"></span><span class="unit"></span>
+				</p>
+				<ul class="btn">
+					<li class="continue">继续选择</li>
+					<li class="uploading">开始上传</li>
+				</ul>
+			</div>
+		</div>
+		<div class="show">
+			<ul class="show-img clearfix">
+			</ul>
+		</div>
+	</div>
+	<script>
+		var release = document.getElementsByClassName("release")[0],
+			select = document.querySelector(".select p"),
+			start = document.getElementsByClassName("uploading")[0],
+			show = document.getElementsByClassName("show")[0],
+			showImg = document.getElementsByClassName("show-img")[0],
+			Num = document.getElementsByClassName("num")[0],
+			Size = document.getElementsByClassName("size")[0],
+			unit = document.getElementsByClassName("unit")[0],
+			cancel = document.getElementsByClassName("cancel"),
+			li = document.getElementsByClassName("show-li"),
+			//图片数组
+			ImgArr = [],
+			//名字数组
+			nameArr = [],
+			//文件大小
+			size = 0,
+			//文件个数
+			num = 0,
+			//是否同名
+			isRepetition = false;
+		Num.innerHTML = num;
+		Size.innerHTML = size;
+		unit.innerHTML = "B";
+		//目标进入
+		release.ondragenter = function(){
+			this.style.border = "2px dashed #ccc";
+			this.innerHTML = "请释放鼠标";
+		}
+		//目标停留
+		release.ondragover = function(e){
+			var e = e || window.event;
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		//目标移出
+		release.ondragleave = function(e){
+			var e = e || window.event;
+			this.style.border = "none";
+			this.innerHTML = "请将图片拖拽到此处";
+		}
+		//目标释放
+		release.ondrop = function(e){
+			var e = e || window.event;
+			e.preventDefault();
+			e.stopPropagation();
+			this.innerHTML = "请将图片拖拽到此处";
+			this.style.border = "none";
+			var files = e.dataTransfer.files;
+			//遍历拖拽文件信息
+			for (key in files){
+				//判断是否有同名文件
+				if(/\d+/.test(key)){
+					nameArr.forEach(function(item,i){
+						if(files[key].name === item){
+							isRepetition = true;
+							release.innerHTML = "有重复文件或有文件名相同不能舔加";
+						}
+					})
+				}
+				//判断拖拽文件信息
+				if(/\d+/.test(key) && /image/.test(files[key].type) && !isRepetition){
+					var imgFile = {},
+						blob = new Blob([files[key]],{type:'image/jpeg'}),
+						url = window.URL.createObjectURL(blob);
+					imgFile.name = files[key].name;
+					imgFile.size = files[key].size;
+					imgFile.type = files[key].type;
+					imgFile.lastModifiedDate
+ = files[key].lastModifiedDate
+;			
+					//将文件名字信息添加到名字数组中
+					nameArr.push(imgFile.name);
+					//将文件信息添加到图片数组中
+					ImgArr.push(imgFile);
+					//文件个数
+					num++;
+					//显示文件大小
+					size += files[key].size;
+					if(size>1024 && size < 1048576 ){
+						Size.innerHTML = (size / 1024).toFixed(2);
+						unit.innerHTML = "KB";
+					}else if(size > 1048576){
+						Size.innerHTML = (size / 1048576).toFixed(2);
+						unit.innerHTML = "MB";
+					}else{
+						Size.innerHTML = size;
+						unit.innerHTML = "B";
+					}
+					//显示图片个数
+					Num.innerHTML = num;
+					//创建预览图
+					var li = document.createElement("li"),
+						p = document.createElement("p"),
+						span = document.createElement("sapn"),
+						I = document.createElement("i"),
+						img = document.createElement("img");
+					I.className = "cancel";
+					I.name = files[key].name;
+					I.size = files[key].size;
+					span.innerHTML = imgFile.name;
+					li.className = "show-li";
+					img.src = url;
+					p.appendChild(span);
+					p.appendChild(I);
+					li.appendChild(p);
+					li.appendChild(img);
+                   	showImg.appendChild(li);
+                   	//添加删除事件 
+                   	I.onclick = function(){
+                   		var that = this;
+						this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+						num--;
+						//显示图片个数
+						Num.innerHTML = num;
+						//显示文件大小
+						size -= this.size;
+						if(size>1024 && size < 1048576 ){
+							Size.innerHTML = (size / 1024).toFixed(2);
+							unit.innerHTML = "KB";
+						}else if(size > 1048576){
+							Size.innerHTML = (size / 1048576).toFixed(2);
+							unit.innerHTML = "MB";
+						}else{
+							Size.innerHTML = size;
+							unit.innerHTML = "B";
+						}
+						nameArr.filter(function(val, index, arr){
+							if(that.name === val){
+								//从名字数组中删除名字
+								nameArr.splice(index,1);
+								//从图片数组中删除图片信息
+								ImgArr.splice(index,1);
+								release.innerHTML = "请将图片拖拽到此处";
+								
+							}
+						})
+					}
+				}
+				isRepetition = false;
+			}
+		}
+	</script>
+
+</body>
+</html>

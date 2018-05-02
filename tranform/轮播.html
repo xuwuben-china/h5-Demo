@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播</title>
+	<link rel="stylesheet" href="../css/heater.css">
+	<style>
+	li{
+		list-style: none;
+	}
+		#banner-warp{
+			position: relative;
+			width: 980px;
+			height: 500px;
+			margin: 100px auto;
+			overflow: hidden;
+		}
+		.banner{
+			position: absolute;
+			width: 500%;
+			height: 100%;
+			transition: 1s cubic-bezier(.37,-0.59,.7,1.55);
+			/*transform: translate3d(480px,0,0);*/
+		}
+		.banner li,.thumbnail li{
+			float: left;
+		}
+		.thumbnail{
+			position: absolute;
+			bottom: 30px;
+			right: 50px;
+		}
+		.thumbnail li{
+			width: 60px;
+			height: 60px;
+			cursor: pointer;
+		}
+		.thumbnail li.on,.thumbnail li.on img{
+			width: 80px;
+			height: 80px;
+		}
+		.thumbnail li.on{
+			margin-top: -10px;
+		}
+		#rocket{
+			position: fixed;
+			bottom: -50px;
+			right: 40px;
+			width: 149px;
+			height: 250px;
+			transition: 2s;
+			background: url("images/plane.png");
+			cursor: pointer;
+		}
+		#rocket.on{
+			bottom: 1000px;
+			animation: takeoff 0.2s steps(1) infinite;
+		}
+		@keyframes takeoff{
+			0%{background-position: -149px 0}
+			20%{background-position: -298px 0}
+			40%{background-position: -447px 0}
+			60%{background-position: -596px 0}
+			80%{background-position: -745px 0}
+			100%{background-position: -149px 0}
+		}
+	</style>
+</head>
+<body>
+	 <div id="heater">
+	    <ul class="nav">
+	      <li>小案例
+	        <ul class="second-nav">
+	          <li><a href="../3d旋转/旋转动画.html">3d旋转</a></li>
+	          <li><a href="../canvas-粒子/粒子.html">canvas-粒子</a></li>
+	          <li><a href="../tranform/轮播.html">tranform</a></li>
+	          <li><a href="../upload/upload.html">upload</a></li>
+	          <li><a href="../本地存储-便签/本地存储-便签.html">本地存储-便签</a></li>
+	          <li><a href="../三维数组时钟/clock.html">canvas时钟</a></li>
+	          <li><a href="../clock.html">时钟</a></li>
+	        </ul>
+	      </li>
+	    </ul>
+	  </div>
+	<div id="banner-warp">
+		<ul class="banner">
+			<li><img src="images/1.jpg" alt=""></li>
+			<li><img src="images/2.jpg" alt=""></li>
+			<li><img src="images/3.jpg" alt=""></li>
+			<li><img src="images/4.jpg" alt=""></li>
+			<li><img src="images/5.jpg" alt=""></li>
+		</ul>
+		<ul class="thumbnail">
+			<li class="on"><img src="images/11.jpg" alt=""></li>
+			<li><img src="images/22.jpg" alt=""></li>
+			<li><img src="images/33.jpg" alt=""></li>
+			<li><img src="images/44.jpg" alt=""></li>
+			<li><img src="images/55.jpg" alt=""></li>
+		</ul>
+	</div>
+	<div id="rocket"></div>
+	<script>
+		var bannerWarp = document.getElementById("banner-warp"),
+			banner = document.getElementsByClassName("banner")[0],
+			thumbnail = document.querySelectorAll(".thumbnail li"),
+			bannerWarpWidth = window.getComputedStyle?window.getComputedStyle(bannerWarp)["width"]:bannerWarp.currentStyle["width"],
+			rocket = document.getElementById("rocket");
+			for(var i=0; i<thumbnail.length; i++){
+				thumbnail[i].index = i;
+				thumbnail[i].onclick = function(){
+					banner.style.transform = 'translate3d('+(-this.index)*parseInt(bannerWarpWidth)+'px, 0, 0)';
+					for(var j=0; j<thumbnail.length; j++){
+						thumbnail[j].className = "";
+					}
+					this.className = "on";
+				}
+
+			}
+			rocket.onclick = function(){
+				var that = this;
+				this.style.transition = '2s';
+				this.className = "on";
+
+				setTimeout(function(){
+					that.style.transition = 'none';
+					that.className = "";
+				},2000)
+			}
+	</script>
+</body>
+</html>

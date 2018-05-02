@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>clock</title>
+	<link rel="stylesheet" href="css/heater.css">
+	<style>
+		*{margin: 0;padding: 0;}
+		html,body{
+			width: 100%;
+			height: 100%;
+			background: url('./clock/img/1.jpg') center top/cover;
+			display: flex;
+		}
+		canvas{
+			margin: auto;
+			-webkit-box-shadow: 0 0 5px blue;
+			box-shadow: 0 0 5px blue;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="heater">
+		<ul class="nav">
+			<li>小案例
+				<ul class="second-nav">
+					<li><a href="./3d旋转/旋转动画.html">3d旋转</a></li>
+					<li><a href="./canvas-粒子/粒子.html">canvas-粒子</a></li>
+					<li><a href="./tranform/轮播.html">tranform</a></li>
+					<li><a href="./upload/upload.html">upload</a></li>
+					<li><a href="./本地存储-便签/本地存储-便签.html">本地存储-便签</a></li>
+					<li><a href="./三维数组时钟/clock.html">三维数组时钟</a></li>
+					<li><a href="./clock.html">时钟</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<canvas width='460' height='460'></canvas>
+	<audio src="./clock/music/second.mp3"></audio>
+	<script>
+		var c = document.querySelector('canvas'),
+			audio = document.querySelector('audio'),
+			img = new Image(),
+			cxt = c.getContext('2d'),
+			width = c.width,
+			height = c.height,
+			r = width/2,
+			secShadow = 0;
+		cxt.translate(r,r);
+		img.src = './clock/img/owl.jpg';
+		img.onload = function () {
+            drawBg();
+        }
+		//绘制背景
+		function drawBg(){
+			//线宽
+			cxt.lineWidth = 4;
+			//触笔颜色
+			cxt.strokeStyle = 'blue';
+			//开始路径
+			cxt.beginPath();
+			//绘制圆
+			cxt.arc(0,0,r-4,0,6.3);
+			// 剪切
+			cxt.clip();
+			//保存路径
+			cxt.save();
+			//绘制图像
+			cxt.drawImage(img,-r,-r,width,height);
+			//恢复路径
+			cxt.restore();
+			//以边框线绘制图形
+			cxt.stroke();
+			//结束路径
+			cxt.closePath();
+			//绘制时钟数字
+			drawNumber();
+			//绘制分刻度
+			drowDot();
+		}
+		//绘制12个时钟数字
+		function drawNumber(){
+			var hourArr = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+			hourArr.forEach(function(num, i){
+				cxt.lineWidth = 1;
+				cxt.strokeStyle = 'blue';
+				cxt.font = '22px Arial';
+				cxt.textAlign = 'center';
+				cxt.textBaseline = 'middle';
+				var x = Math.sin((i+1)*30*Math.PI/180)*(r-30);
+				var y = Math.cos((i+1)*30*Math.PI/180)*(r-30)
+				cxt.strokeText(num, x, y);
+			})
+		}
+		//绘制分刻度
+		function drowDot(){
+			for(var i=0; i<60; i++){
+				var x = Math.sin( (i+1)*6*Math.PI/180 )*(r-30);
+                var y = -Math.cos( (i+1)*6*Math.PI/180 )*(r-30);
+                cxt.beginPath();
+                cxt.save();
+                if((i+1)%5 === 0){
+                	continue
+                }
+                cxt.arc(x,y,3,0,2*Math.PI);
+                if(i+1 === secShadow){
+                	cxt.save();
+                	cxt.fillStyle = 'gold';
+                	cxt.shadowColor = 'blue';
+                	cxt.shadowBlur = 8;
+                	cxt.fill();
+                	cxt.restore();
+                }else{
+                	cxt.save();
+                	cxt.fillStyle = 'blue';
+                	cxt.fill();
+                	cxt.restore();
+                }
+			}
+		}
+		//绘制时针
+		function drawHour(hour, minute){
+			cxt.save();
+			cxt.beginPath();
+			cxt.lineWidth = 14;
+			cxt.strokeStyle = '#222';
+			//边界接点样式 圆
+			cxt.lineCap = 'round';
+			var deg = 2*Math.PI/12*hour;
+			var deg_minute = 2*Math.PI/12/60*minute;
+			cxt.rotate(deg + deg_minute);
+			cxt.moveTo(0,12);
+			cxt.lineTo(0,-92);
+			cxt.stroke();
+			cxt.restore();
+			cxt.closePath();
+		}
+		//绘制分针
+		function drawMinute(minute, second){
+			cxt.save();
+            cxt.beginPath();
+            cxt.lineWidth = 6;
+            cxt.strokeStyle = 'gold';
+            cxt.fillStyle = 'gold';
+
+            var deg = 2 * Math.PI / 60 * minute;
+            var deg_second = 2 * Math.PI / 60 / 60 * second;
+
+            cxt.rotate(deg+deg_second);
+
+            cxt.moveTo(0,-138);
+            cxt.lineTo(-6,18);
+            cxt.lineTo(6,18);
+            cxt.fill();  // 技艺
+            cxt.restore();
+            cxt.closePath();
+		}
+		//绘制秒针
+		function drawSecond(second){
+			cxt.save();
+            cxt.beginPath();
+            cxt.lineWidth = 6;
+            cxt.fillStyle = 'red';
+
+            var deg = 2 * Math.PI / 60 * second;
+
+            cxt.rotate(deg);
+
+            cxt.moveTo(0,-184);
+            cxt.lineTo(-6,18);
+            cxt.lineTo(6,18);
+            cxt.fill();  // 技艺
+            cxt.restore();
+            cxt.closePath();
+
+            cxt.save();
+            cxt.beginPath();
+            cxt.fillStyle = '#000';
+            cxt.arc(0,0,8,0,2*Math.PI);
+            cxt.fill();
+            cxt.restore();
+            cxt.closePath();
+            
+		}
+		//绘制眼睛
+		function drawEye(second){
+			cxt.save();
+			cxt.beginPath();
+			var deg = 2*Math.PI/60*second;
+			cxt.globalAlpha = 0.4;
+			var x1 = -36,
+				y1 = -51,
+				r1 = 12;
+			var x2 = 37,
+				y2 = -51,
+				r2 = 14;
+			cxt.arc(x1+9*Math.sin(deg),y1-9*Math.cos(deg),r1,0,2*Math.PI);
+			cxt.arc(x2+12*Math.sin(deg),y2-12*Math.cos(deg),r2,0,2*Math.PI);
+			cxt.fill();
+			cxt.restore();
+			cxt.closePath();
+		}
+		drawClock();
+		//绘制表盘
+		function drawClock(){
+			cxt.clearRect(-r,-r,width,height);
+			
+			var date = new Date();
+			var H = zero(date.getHours());
+            var M = zero(date.getMinutes());
+            var S = zero(date.getSeconds()); 
+            var s = date.getSeconds(); 
+            secShadow = s;
+            document.title = H +':'+ M +':'+ S;
+            drawBg();
+            drawEye(S);
+            drawHour(H,M);
+            drawMinute(M,S);
+            drawSecond(S);
+            requestAnimationFrame(drawClock);
+            audio.play();
+		}
+		//补零
+		function zero(num){
+			return num > 10 ? num : '0'+num;
+		}
+	</script>
+</body>
+</html>

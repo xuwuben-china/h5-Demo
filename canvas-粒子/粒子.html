@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>粒子</title>
+  <link rel="stylesheet" href="../css/heater.css">
+	<style>
+		 * {
+            margin: 0;
+            padding: 0
+        }
+        canvas{
+            background: #ccc;
+            display: block;
+        }
+	</style>
+</head>
+<body>
+  <div id="heater">
+    <ul class="nav">
+      <li>小案例
+        <ul class="second-nav">
+          <li><a href="../3d旋转/旋转动画.html">3d旋转</a></li>
+          <li><a href="../canvas-粒子/粒子.html">canvas-粒子</a></li>
+          <li><a href="../tranform/轮播.html">tranform</a></li>
+          <li><a href="../upload/upload.html">upload</a></li>
+          <li><a href="../本地存储-便签/本地存储-便签.html">本地存储-便签</a></li>
+          <li><a href="../三维数组时钟/clock.html">canvas时钟</a></li>
+          <li><a href="../clock.html">时钟</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+	<canvas></canvas>
+	<script>
+		var c = document.querySelector('canvas');
+        var cxt = c.getContext('2d');
+        var num = 500;
+        window.onresize = resize;
+
+        var mouse = {
+        	x: null,
+        	y: null,
+        	max: 20000
+        }
+        window.addEventListener('mousemove',function (e) {
+            e = e || event;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+        })
+        window.onmouseout = function () {
+            mouse.x = null;
+            mouse.y = null;
+        }
+        resize();
+        function resize(){
+        	c.width = window.innerWidth;
+            c.height = window.innerHeight;
+        }
+        var dots = [];
+        for ( var i=0;i<num;i++ ){
+            var x = Math.random()*c.width;
+            var y = Math.random()*c.height;
+            var xv = Math.random()*2-1;
+            var yv = Math.random()*2-1;
+            dots.push({
+                x:x,
+                y:y,
+                xv:xv,
+                yv:yv,
+                max:6000
+            });
+        }
+        createGranule();
+  		function createGranule(){
+  			var ndots = [mouse].concat(dots);
+  			cxt.clearRect(0,0,c.width,c.height)
+  			dots.forEach(function(dot){
+  				dot.x += dot.xv;
+  				dot.y += dot.yv;
+  				dot.xv *= (dot.x > c.width || dot.x < 0) ? -1 : 1;
+  				dot.yv *= (dot.y > c.height || dot.x < 0) ? -1 : 1;
+  				cxt.fillRect(dot.x-0.5,dot.y-0.5,1,1);
+  				for(var i=0; i<ndots.length; i++){
+  					var now = ndots[i];
+  					/*if( dot === now || now.x === null || now.y === null ){
+                        continue;
+                    }*/
+  					var diffX = dot.x - now.x;
+  					var diffY = dot.y - now.y;
+  					var scale;
+  					var dis = diffX*diffX + diffY*diffY;
+  					if(dis <= now.max){
+  						if( now === mouse && dis > now.max/2 ){
+  							if(now.x===null || now.y===null){
+  								continue;
+  							}
+                            dot.x -= diffX * 0.03;
+                            dot.y -= diffY * 0.03;
+                        }
+  						scale = (now.max - dis)/now.max;
+  						cxt.beginPath();
+  						cxt.lineWidth = scale/2;
+  						cxt.strokeStyle = 'rgba(255,0,0,0.4)';
+  						cxt.moveTo(dot.x,dot.y);
+  						cxt.lineTo(now.x,now.y);
+  						cxt.stroke();
+  					}
+  				}
+  				ndots.splice(ndots.indexOf(dot),1);
+  			})
+  			requestAnimationFrame(createGranule)
+  		}
+	</script>
+</body>
+</html>

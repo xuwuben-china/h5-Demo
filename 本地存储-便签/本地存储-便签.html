@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>本地存储</title>
+		<link rel="stylesheet" href="css/date.css">
+		<link rel="stylesheet" href="../css/heater.css">
+		<style type="text/css">
+			*{margin:0px; padding:0px;}
+			html,body{ height:100%; }
+			body{
+				background:url(image/body.gif);
+				overflow:hidden;
+				
+			}
+			.Menu{
+				width:200px;
+				background:#fff;
+				position:absolute; 
+				left:500px;
+				top:100px;
+				z-index:33;
+				display:none;
+			}
+			.Menu ul li{
+				list-style-type:none;
+				height:35px;
+				font-size:14px;
+				color:#666; 
+				line-height:35px;
+				text-indent:25px;
+				font-family:"微软雅黑";
+				border-bottom:1px solid #ddd;
+				box-sizing: border-box;
+
+			}
+			.Menu ul li:hover{
+				cursor: pointer;
+			}
+			.Menu ul li:last-child{
+				border:none;
+			}
+			.Menu ul li img{
+				margin-right:10px;
+			}
+			.Menu ul li.hover{
+				background:#009999;
+				color:#fff;
+			}
+			#desk_list{
+				width:100%;
+				position:relative;
+			}
+			#desk_list .desk{
+				width:294px; 
+				height:250px;
+				position:absolute;
+				padding-top:60px;
+			}
+			#desk_list .desk .desk_con{
+				width:250px;
+				height:200px; 
+				background:#fff;
+				margin:0px auto; 
+				cursor:move;
+				-webkit-user-select:none;
+				-moz-user-select:none;
+				-ms-user-select:none;
+				user-select:none;
+			}
+			#desk_list .desk  p{
+				height:40px;
+				line-height:40px;
+				text-align:center; 
+				font-size:12px;
+			}
+			#desk_list .desk  p span{
+				color:red;
+				padding:0px 5px; 
+				font-size:14px;
+				font-family:"Arial";
+			}
+		</style>
+	</head>
+	<body>
+		 <div id="heater">
+		    <ul class="nav">
+		      <li>小案例
+		        <ul class="second-nav">
+		          <li><a href="../3d旋转/旋转动画.html">3d旋转</a></li>
+		          <li><a href="../canvas-粒子/粒子.html">canvas-粒子</a></li>
+		          <li><a href="../tranform/轮播.html">tranform</a></li>
+		          <li><a href="../upload/upload.html">upload</a></li>
+		          <li><a href="../本地存储-便签/本地存储-便签.html">本地存储-便签</a></li>
+		          <li><a href="../三维数组时钟/clock.html">canvas时钟</a></li>
+		          <li><a href="../clock.html">时钟</a></li>
+		        </ul>
+		      </li>
+		    </ul>
+		  </div>
+		<!--菜单开始-->
+		<div class="Menu" id='Menu'>
+			<ul>
+				<li class='addAdhibition'><img src="image/ico1.jpg" align="absmiddle" />添加应用</li>
+				<li class="addMemo"><img src="image/ico1.jpg" align="absmiddle" />添加便签</li>
+				<li class='clearMemo'><img src="image/ico2.jpg" align="absmiddle" />清除便签</li>
+				<li class='reload'><img src="image/ico3.jpg" align="absmiddle" />刷新</li>
+				<li class='upload'><img src="image/ico4.jpg" align="absmiddle" />上传资料</li>
+				<li class="chageBG"><img src="image/ico5.jpg" align="absmiddle" />更换背景</li>
+				<li class='logout'><img src="image/ico6.jpg" align="absmiddle" />注销</li>
+			</ul>
+		</div>
+		<!--菜单结束-->
+		<!--留言本的列表开始-->
+		<div id="desk_list">
+		</div>
+		<!--留言本的列表结束-->
+		<!-- 【日期 start】-->
+		<div id="date">
+			<div class="date_main clearfix">
+				<div class="date_left">
+					<ul class="styleCircle">
+						<li></li><li></li><li></li><li></li>
+					</ul>
+					<div class="main">
+						<p class="month" id='month'>1月</p>
+						<p class="date" id='day'>1</p>
+					</div>
+				</div>
+				<div class="date_right">
+					<p class="time" id='time'>00 : 00 : 00</p>
+					<p class="date" id='year'>0000年00月00日</p>
+					<p class="week" id='week'>星期一</p>
+				</div>
+			</div>
+			<div class="date_close" id='date_close' style=""></div>
+		</div>
+		<!-- 【日期 end】-->
+		<script src='js/timeMove.js'></script>
+		<script src='js/date.js'></script>
+		<script>
+			var Menu = document.getElementById('Menu'),
+				MenuLi = document.getElementsByTagName('li');
+				addAdhibition = document.getElementsByClassName('addAdhibition')[0],
+				addMemo = document.getElementsByClassName('addMemo')[0],
+				clearMemo = document.getElementsByClassName('clearMemo')[0],
+				reload = document.getElementsByClassName('reload')[0],
+				upload = document.getElementsByClassName('upload')[0],
+				chageBG = document.getElementsByClassName('chageBG')[0],
+				logout = document.getElementsByClassName('logout')[0],
+				date = document.getElementById('date'),
+				deskList = document.getElementById('desk_list');
+				// desk = document.getElementsByClassName('desk');
+
+			document.oncontextmenu = function(e){
+				return false;
+			}
+			document.onmousedown = function (e) {
+				console.log( e.target.parentNode );
+
+				if( e.which == 3 ){
+				    var z = window.localStorage.getItem('z')+5;
+                    Menu.style.cssText = 'display:block;left:'+e.clientX+'px;top:'+e.clientY+'px;z-index:'+z;
+				}
+		        document.addEventListener('click', function(){
+		        	Menu.style.display = 'none'
+		        });
+		        Menu.addEventListener('mouseover',function(e){
+		        	for(var i=0; i<MenuLi.length; i++){
+		        		MenuLi[i].classList.remove('hover')
+		        	}
+		        	e.target.classList.add('hover');
+		        })
+		        for(var i=0; i<MenuLi.length; i++){
+
+		        	MenuLi[i].onclick = function(){
+		        		switch(e.target){
+		        			case addAdhibition: 
+		        			date.style.display = 'block';
+		        				break;
+		        			case addMemo: 
+		        			console.log(e.target);
+		        				deskList.innerHTML +='<div class="desk" style="background:url(image/'+randomNum(3)+'.png); top:'+e.clientY+'px; left:'+e.clientX+'px;"><div class="desk_con" contenteditable=\'true\'></div><p class="text">自动保存</p></div>';
+		        				break;
+		        			case clearMemo:
+		        			console.log()
+		        				clearMemoFn(target);
+		        				break;
+		        			case reload: 
+		        			console.log(e.target);
+		        				break;
+		        			case upload: 
+		        			console.log(e.target);
+		        				break;
+		        			case chageBG: 
+		        			console.log(e.target);
+		        				break;
+		        			case logout: 
+		        			console.log(e.target);
+		        				break;
+		        		}
+		        	}
+		        }
+		        if(e.target.className === 'desk'){
+
+		        }
+            }
+            function clearMemoFn(target){
+            	console.log(target)
+            	if(target.className === 'desk' || target.className === 'desk_on' || target.className === 'text'){
+            		console.log('qc')
+            		deskList.removeChild(target || target.parentNode)
+            	}
+            }
+            function randomNum(n){
+            	return Math.floor(Math.random()*n) + 1;
+            }
+		</script>
+ </body>
+</html>
